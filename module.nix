@@ -123,15 +123,27 @@ in {
       extraConfig = ''
         index index.php;
       '';
+      locations."/" = {
+        extraConfig = ''
+          index index.php;
+          try_files $uri $uri/ =404;
+        '';
+      };
+
       locations."~ ^(.+\\.php)(.*)$" = {
         extraConfig = ''
           include ${config.services.nginx.package}/conf/fastcgi.conf;
           fastcgi_pass unix:${config.services.phpfpm.pools.i-librarian.socket};
           fastcgi_split_path_info ^(.+\.php)(.*)$;
+
+          # Use the standard FastCGI parameters
+          fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
           fastcgi_param PATH_INFO $fastcgi_path_info;
 
+          # Tell PHP to ignore its local port (61018) and use the Frontend's logic
           fastcgi_param HTTPS on;
-          fastcgi_param HTTP_X_FORWARDED_PROTO https;
+          fastcgi_param SERVER_PORT 443;
+          fastcgi_param HTTP_HOST ${cfg.domain};
         '';
       };
     };
