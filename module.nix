@@ -70,11 +70,26 @@ in {
 
     services.phpfpm.pools.i-librarian = {
       user = "i-librarian";
-      phpPackage = pkgs.php.withExtensions ({
-        enabled,
-        all,
-      }:
-        enabled ++ [all.sysvshm all.curl all.xml all.dom all.openssl]);
+      phpPackage = pkgs.php.withExtensions (
+        {
+          enabled,
+          all,
+        }:
+          enabled
+          ++ [
+            all.sysvshm
+            all.curl
+            all.xml
+            all.dom
+            all.openssl
+            all.sqlite3 # Critical for the DB
+            all.sodium # Critical for security
+            all.gd # Image handling
+            all.mbstring # String handling
+            all.intl # Localisation
+            all.zip # File exports
+          ]
+      );
       phpEnv.PATH = "${makeBinPath extraBin}:/run/wrappers/bin:/run/current-system/sw/bin";
       settings = {
         "listen.owner" = "nginx";
@@ -112,7 +127,11 @@ in {
         extraConfig = ''
           include ${config.services.nginx.package}/conf/fastcgi.conf;
           fastcgi_pass unix:${config.services.phpfpm.pools.i-librarian.socket};
+          fastcgi_split_path_info ^(.+\.php)(.*)$;
           fastcgi_param PATH_INFO $fastcgi_path_info;
+
+          fastcgi_param HTTPS on;
+          fastcgi_param HTTP_X_FORWARDED_PROTO https;
         '';
       };
     };
