@@ -2,6 +2,7 @@
   lib,
   stdenvNoCC,
   fetchurl,
+  bgImage ? null,
   ...
 }:
 stdenvNoCC.mkDerivation rec {
@@ -20,6 +21,13 @@ stdenvNoCC.mkDerivation rec {
     runHook preInstall
     mkdir -p "$out"
     cp -r app classes config public "$out"
+
+    ${lib.optionalString (bgImage != null) ''
+      mkdir -p $out/public/img
+      # Assuming bgImage is a directory or a file
+      cp -r ${bgImage}/* $out/public/img/
+    ''}
+
     runHook postInstall
   '';
 

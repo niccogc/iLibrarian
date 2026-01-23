@@ -6,8 +6,9 @@
 }:
 with lib; let
   cfg = config.services.i-librarian;
-  pkg = pkgs.callPackage ./derivation.nix {};
-
+  pkg = pkgs.callPackage ./derivation.nix {
+    bgImage = cfg.backgroundImage;
+  };
   configPath = pkgs.buildEnv {
     name = "i-librarian-config";
     paths = [pkg];
@@ -51,6 +52,11 @@ in {
       default = "/var/lib/i-librarian";
     };
     domain = mkOption {type = types.str;};
+    backgroundImage = mkOption {
+      type = types.nullOr types.path;
+      default = null;
+      description = "Path to custom background images to be injected into the package.";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -91,7 +97,7 @@ in {
       "d ${cfg.dataDir}/data 0700 i-librarian i-librarian - -"
     ];
 
-    services.nginx.virtualHosts."${cfg.domain}" = {
+    services.nginx.virtualHosts."iLibrarian" = {
       root = publicPath;
       listen = [
         {
