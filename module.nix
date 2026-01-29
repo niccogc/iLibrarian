@@ -137,8 +137,9 @@ in {
           fastcgi_split_path_info ^(.+\.php)(.*)$;
           fastcgi_param PATH_INFO $fastcgi_path_info;
 
-          fastcgi_param SERVER_PORT 443;
-          fastcgi_param HTTPS on;
+          # fastcgi_param SERVER_PORT 443;
+          # fastcgi_param HTTPS on;
+          fastcgi_param HTTPS $https if_not_empty;
 
           fastcgi_param HTTP_HOST ilibrarian.${cfg.domain};
           fastcgi_param SERVER_NAME ilibrarian.${cfg.domain};
