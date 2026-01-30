@@ -129,7 +129,6 @@ in {
           try_files $uri $uri/ =404;
         '';
       };
-
       locations."~ ^(.+\\.php)(.*)$" = {
         extraConfig = ''
           include ${config.services.nginx.package}/conf/fastcgi.conf;
@@ -137,10 +136,11 @@ in {
           fastcgi_split_path_info ^(.+\.php)(.*)$;
           fastcgi_param PATH_INFO $fastcgi_path_info;
 
-          # fastcgi_param SERVER_PORT 443;
-          # fastcgi_param HTTPS on;
-          fastcgi_param HTTPS $https if_not_empty;
+          # Force HTTPS and Port 443 so absolute URLs generate correctly
+          fastcgi_param HTTPS on;
+          fastcgi_param SERVER_PORT 443;
 
+          # Use the domain from the config directly
           fastcgi_param HTTP_HOST ilibrarian.${cfg.domain};
           fastcgi_param SERVER_NAME ilibrarian.${cfg.domain};
         '';
