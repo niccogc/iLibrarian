@@ -101,8 +101,8 @@ in {
         "pm.max_spare_servers" = 20;
         "request_terminate_timeout" = "60s";
         "pm.max_requests" = 500;
-        "slowlog" = "/var/log/php-fpm/i-librarian.slow.log";
-        "request_slowlog_timeout" = "10s";
+        # "slowlog" = "/var/log/php-fpm/i-librarian.slow.log";
+        # "request_slowlog_timeout" = "10s";
       };
       phpOptions = ''
         upload_max_filesize = 200M
